@@ -136,3 +136,81 @@ exports.allOrders = catchAsyncErrors(async (req, res, next) => {
     orders,
   });
 });
+
+// Get orders for the logged-in restaurant owner's restaurant
+// =>  GET /api/v1/eats/orders/restaurant/incoming
+exports.getRestaurantOrders = catchAsyncErrors(async (req, res, next) => {
+  const Restaurant = require("../models/restaurant");
+
+  const restaurant = await Restaurant.findOne({ owner: req.user._id });
+
+  if (!restaurant) {
+    return next(
+      new ErrorHandler("No restaurant is linked to this account yet.", 404)
+    );
+  }
+
+  const orders = await Order.find({ restaurant: restaurant._id })
+    .populate("user", "name email phoneNumber")
+    .sort({ createdAt: -1 })
+    .exec();
+
+  res.status(200).json({
+    success: true,
+    restaurant: { _id: restaurant._id, name: restaurant.name },
+    count: orders.length,
+    orders,
+  });
+});
+
+// Allowed order status values, in the order they normally progress
+const ORDER_STATUS_FLOW = [
+  "Processing",
+  "Accepted",
+  "Preparing",
+  "Out for Delivery",
+  "Delivered",
+];
+
+// Update order status (restaurant owner only, and only for their own restaurant's orders)
+// =>  PUT /api/v1/eats/orders/:id/status
+exports.updateOrderStatus = catchAsyncErrors(async (req, res, next) => {
+  const Restaurant = require("../models/restaurant");
+  const { status } = req.body;
+
+  if (!status || (!ORDER_STATUS_FLOW.includes(status) && status !== "Cancelled")) {
+    return next(
+      new ErrorHandler(
+        `Invalid status. Must be one of: ${ORDER_STATUS_FLOW.join(", ")}, or Cancelled`,
+        400
+      )
+    );
+  }
+
+  const order = await Order.findById(req.params.id);
+  if (!order) {
+    return next(new ErrorHandler("No order found with this ID", 404));
+  }
+
+  // Confirm this order belongs to a restaurant owned by the requesting user
+  const restaurant = await Restaurant.findOne({
+    _id: order.restaurant,
+    owner: req.user._id,
+  });
+  if (!restaurant) {
+    return next(
+      new ErrorHandler("You are not authorized to update this order.", 403)
+    );
+  }
+
+  order.orderStatus = status;
+  if (status === "Delivered") {
+    order.deliveredAt = Date.now();
+  }
+  await order.save();
+
+  res.status(200).json({
+    success: true,
+    order,
+  });
+});

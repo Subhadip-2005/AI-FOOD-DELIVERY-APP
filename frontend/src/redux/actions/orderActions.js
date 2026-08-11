@@ -12,7 +12,13 @@ import {
     myOrdersFail,
     orderDetailsRequest,
     orderDetailsSuccess,
-    orderDetailsFail
+    orderDetailsFail,
+    restaurantOrdersRequest,
+    restaurantOrdersSuccess,
+    restaurantOrdersFail,
+    updateOrderStatusRequest,
+    updateOrderStatusSuccess,
+    updateOrderStatusFail
 } from "../slices/orderSlice"
 
 //create order
@@ -89,6 +95,44 @@ export const getOrderDetails = (id) => async(dispatch) =>{
     }catch(error)
     {
        dispatch(orderDetailsFail(error.response?.data?.message))
+    }
+}
+
+//restaurant owner: get incoming orders for their restaurant
+export const getRestaurantOrders = () => async(dispatch) =>{
+    try{
+
+        dispatch(restaurantOrdersRequest());
+        const {data} = await api.get("/v1/eats/orders/restaurant/incoming")
+
+        dispatch(restaurantOrdersSuccess(data))
+
+    }catch(error)
+    {
+       dispatch(restaurantOrdersFail(error.response?.data?.message))
+    }
+}
+
+//restaurant owner: update an order's status
+export const updateOrderStatus = (id, status) => async(dispatch) =>{
+    try{
+
+        dispatch(updateOrderStatusRequest());
+        const {data} = await api.put(`/v1/eats/orders/${id}/status`, { status },
+            {
+                headers:{
+                    "Content-Type": "application/json"
+                }
+            }
+        )
+
+        dispatch(updateOrderStatusSuccess(data.order))
+        return data.order
+
+    }catch(error)
+    {
+       dispatch(updateOrderStatusFail(error.response?.data?.message))
+       throw error
     }
 }
 

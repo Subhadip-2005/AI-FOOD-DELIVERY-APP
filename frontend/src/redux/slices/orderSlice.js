@@ -4,7 +4,13 @@ const initialState ={
     loading: false,
     error:null,
     order:null,
-    orders:[]
+    orders:[],
+    restaurantOrders:[],
+    restaurantOrdersLoading:false,
+    restaurantOrdersError:null,
+    restaurantName:null,
+    updatingOrderId:null,
+    updateError:null
 }
 
 const orderSlice = createSlice({
@@ -65,6 +71,35 @@ const orderSlice = createSlice({
             state.error= action.payload
         },
 
+        // Restaurant owner: incoming orders
+        restaurantOrdersRequest:(state)=>{
+            state.restaurantOrdersLoading=true;
+            state.restaurantOrdersError=null;
+        },
+        restaurantOrdersSuccess:(state,action)=>{
+            state.restaurantOrdersLoading= false;
+            state.restaurantOrders= action.payload.orders;
+            state.restaurantName= action.payload.restaurant?.name;
+        },
+        restaurantOrdersFail:(state,action)=>{
+            state.restaurantOrdersLoading= false;
+            state.restaurantOrdersError= action.payload;
+        },
+
+        // Restaurant owner: update order status
+        updateOrderStatusRequest:(state)=>{
+            state.updateError=null;
+        },
+        updateOrderStatusSuccess:(state,action)=>{
+            const updated = action.payload;
+            state.restaurantOrders = state.restaurantOrders.map((o) =>
+                o._id === updated._id ? updated : o
+            );
+        },
+        updateOrderStatusFail:(state,action)=>{
+            state.updateError= action.payload;
+        },
+
     }
 })
 
@@ -81,7 +116,13 @@ export const {
     myOrdersFail,
     orderDetailsRequest,
     orderDetailsSuccess,
-    orderDetailsFail
+    orderDetailsFail,
+    restaurantOrdersRequest,
+    restaurantOrdersSuccess,
+    restaurantOrdersFail,
+    updateOrderStatusRequest,
+    updateOrderStatusSuccess,
+    updateOrderStatusFail
 } = orderSlice.actions
 
 export default orderSlice.reducer

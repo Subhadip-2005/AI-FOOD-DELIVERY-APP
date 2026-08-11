@@ -6,6 +6,7 @@ const {
   createRestaurant,
   getRestaurant,
   deleteRestaurant,
+  assignOwner,
 } = require("../controllers/restaurantController");
 
 const { protect } = require("../controllers/authController");
@@ -22,6 +23,10 @@ router
   .route("/:storeId")
   .get(getRestaurant)
   .delete(protect, authorizeRoles("admin"), deleteRestaurant);
+
+router
+  .route("/:storeId/owner")
+  .put(protect, authorizeRoles("admin"), assignOwner);
 
 router.use("/:storeId/menus", menuRoutes);
 

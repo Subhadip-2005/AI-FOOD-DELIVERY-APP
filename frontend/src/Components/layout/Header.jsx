@@ -91,6 +91,15 @@ const Header = () => {
                   Orders
                 </Link>
 
+                {user?.role === "restaurant-owner" && (
+                  <Link
+                    className="dropdown-item"
+                    to="/restaurant/dashboard"
+                  >
+                    Restaurant Dashboard
+                  </Link>
+                )}
+
                 <Link className="dropdown-item" to="/users/me">
                   Profile
                 </Link>

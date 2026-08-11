@@ -7,6 +7,11 @@ const restaurantSchema = new mongoose.Schema({
     trim: true,
     maxLength: [100, "Restaurant name cannot exceed 100 characters"],
   },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: false,
+  },
   isVeg: {
     type: Boolean,
     default: false,

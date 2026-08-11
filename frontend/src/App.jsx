@@ -20,6 +20,7 @@ import Cart from "./components/cart/Cart";
 import OrderSuccess from "./components/cart/OrderSuccess";
 import ListOrders from "./components/order/ListOrders";
 import OrderDetails from "./components/order/OrderDetails";
+import RestaurantDashboard from "./components/order/RestaurantDashboard";
 
 function App() {
   useEffect(() => {
@@ -59,6 +60,12 @@ function App() {
               <Route path="/success" element={<OrderSuccess />} />
               <Route path="/eats/orders/me/myOrders" element={<ListOrders />} />
               <Route path="/eats/orders/:id" element={<OrderDetails />} />
+
+              {/* restaurant owner */}
+              <Route
+                path="/restaurant/dashboard"
+                element={<RestaurantDashboard />}
+              />
             </Routes>
           </div>
           <Footer />
