@@ -12,6 +12,8 @@ import Login from "./components/user/Login";
 import Register from "./components/user/Register";
 import Profile from "./components/user/Profile";
 import UpdateProfile from "./components/user/UpdateProfile";
+import ForgotPassword from "./components/user/ForgotPassword";
+import NewPassword from "./components/user/NewPassword";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -49,8 +51,8 @@ function App() {
               <Route path="/users/me" element={<Profile />} />
               <Route path="/users/me/update" element={<UpdateProfile />} />
 
-              {/* <Route path="/user/forgetPassword" element={<ForgotPassword/>}/>
-              <Route path="/users/resetPassword/:token" element={<NewPassword/>}/> */}
+              <Route path="/users/forgetPassword" element={<ForgotPassword/>}/>
+              <Route path="/users/resetPassword/:token" element={<NewPassword/>}/>
 
               {/* cart */}
 

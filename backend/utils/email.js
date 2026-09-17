@@ -27,24 +27,54 @@ module.exports = class Email {
     });
   }
 
+  // async send(template, subject) {
+  //   const html = pug.renderFile(`${__dirname}/../view/${template}.pug`, {
+  //     firstName: this.firstName,
+  //     url: this.url,
+  //     subject,
+  //   });
+
+  //   // 2) Define email options
+  //   const mailOptions = {
+  //     from: this.from,
+  //     to: this.to,
+  //     subject,
+  //     html,
+  //     text: htmlToText.convert(html),
+  //   };
+
+  //   await this.newTransport().sendMail(mailOptions);
+  // }
   async send(template, subject) {
-    const html = pug.renderFile(`${__dirname}/../view/${template}.pug`, {
+  let html;
+  try {
+    html = pug.renderFile(`${__dirname}/../view/${template}.pug`, {
       firstName: this.firstName,
       url: this.url,
       subject,
     });
-
-    // 2) Define email options
-    const mailOptions = {
-      from: this.from,
-      to: this.to,
-      subject,
-      html,
-      text: htmlToText.convert(html),
-    };
-
-    await this.newTransport().sendMail(mailOptions);
+  } catch (err) {
+    console.error("Pug template render error:", err.message);
+    throw err;
   }
+
+  const mailOptions = {
+    from: this.from,
+    to: this.to,
+    subject,
+    html,
+    text: htmlToText.convert(html),
+  };
+
+  try {
+    await this.newTransport().sendMail(mailOptions);
+    console.log("Email sent successfully to:", this.to);
+  } catch (err) {
+    console.error("Nodemailer sendMail error:", err.message);
+    console.error("Full error:", err);
+    throw err;
+  }
+}
 
   async sendWelcome() {
     await this.send("welcome", "welcome to the Order It!");

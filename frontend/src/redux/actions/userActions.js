@@ -96,3 +96,30 @@ export const logout = () => async (dispatch) => {
     dispatch(logoutFail(error.response?.data?.message));
   }
 };
+//forgot password
+export const forgotPassword = (email) => async (dispatch) => {
+  try {
+    dispatch(loginRequest());
+    const { data } = await api.post("/v1/users/forgetPassword", { email });
+    dispatch(loginFail(null)); // clear loading without setting an error
+    return data;
+  } catch (error) {
+    dispatch(loginFail(error.response?.data?.message || "Something went wrong"));
+    throw error;
+  }
+};
+
+//reset password
+export const resetPassword = (token, passwords) => async (dispatch) => {
+  try {
+    dispatch(loginRequest());
+    const { data } = await api.patch(
+      `/v1/users/resetPassword/${token}`,
+      passwords
+    );
+    dispatch(loginSuccess(data.data.user));
+  } catch (error) {
+    dispatch(loginFail(error.response?.data?.message || "Reset failed"));
+    throw error;
+  }
+};
